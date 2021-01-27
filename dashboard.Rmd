@@ -1,0 +1,60 @@
+---
+title: "Blog Popularity"
+output: 
+  flexdashboard::flex_dashboard:
+  orientation: columns
+vertical_layout: fill
+---
+  
+```{r setup, include=FALSE}
+library(flexdashboard)
+library(plotly)
+library(dplyr)
+library(reactable)
+library(readr)
+gadata <- read_csv("data.csv")
+```
+
+This report shows the Google Analytics data from **gerinberg.com**.
+
+Column {data-width=650}
+-----------------------------------------------------------------------
+  
+### Page Views by Day
+  
+```{r}
+gadata_by_day <- gadata %>% 
+  group_by(date) %>% 
+  summarize(pagesums = sum(pageviews))
+
+plot_ly(gadata_by_day, 
+        x = ~date, 
+        y = ~pagesums, 
+        type = 'scatter', 
+        mode = 'lines') %>%
+  layout(title = "Daily Page Views in 2020",
+         xaxis = list(title = "Date"),
+         yaxis = list (title = "Page Views")) %>%
+  config(displayModeBar = FALSE)
+```
+
+Column {data-width=350}
+-----------------------------------------------------------------------
+  
+### Most Popular Posts
+  
+```{r}
+gadata_most_popular <- gadata %>%
+  group_by(pageTitle) %>%
+  summarize(n = sum(pageviews)) %>%
+  arrange(desc(n))
+
+reactable(gadata_most_popular,
+          columns = list(pageTitle     = colDef(name = "Title",
+                                                align = "left", 
+                                                maxWidth = 250),
+                         n             = colDef(name = "Page Views",
+                                                maxWidth = 100)),
+          searchable = TRUE,
+          striped = TRUE)
+```
