@@ -15,14 +15,14 @@ library(readr)
 gadata <- read_csv("data.csv")
 ```
 
-This report shows the Google Analytics data from **gerinberg.com**.
+This report shows the Google Analytics data from [gerinberg.com](https://gerinberg.com).
 
-Column {data-width=650}
+Column {data-width=900}
 -----------------------------------------------------------------------
-  
+
 ### Page Views by Day
   
-```{r}
+```{r pageviews}
 gadata_by_day <- gadata %>% 
   group_by(date) %>% 
   summarize(pagesums = sum(pageviews))
@@ -38,12 +38,12 @@ plot_ly(gadata_by_day,
   config(displayModeBar = FALSE)
 ```
 
-Column {data-width=350}
+Column {.tabset data-width=450}
 -----------------------------------------------------------------------
   
 ### Most Popular Posts
   
-```{r}
+```{r popular_posts}
 gadata_most_popular <- gadata %>%
   group_by(pageTitle) %>%
   summarize(n = sum(pageviews)) %>%
@@ -52,8 +52,28 @@ gadata_most_popular <- gadata %>%
 reactable(gadata_most_popular,
           columns = list(pageTitle     = colDef(name = "Title",
                                                 align = "left", 
-                                                maxWidth = 250),
+                                                maxWidth = 350),
                          n             = colDef(name = "Page Views",
+                                                align = "right",
+                                                maxWidth = 100)),
+          searchable = TRUE,
+          striped = TRUE)
+```
+
+### Users Location
+  
+```{r popular_posts2}
+gadata_location <- gadata %>%
+  group_by(country) %>%
+  summarize(n = sum(pageviews)) %>%
+  arrange(desc(n))
+
+reactable(gadata_location,
+          columns = list(country       = colDef(name = "Country",
+                                                align = "left", 
+                                                maxWidth = 350),
+                         n             = colDef(name = "Page Views",
+                                                align = "right",
                                                 maxWidth = 100)),
           searchable = TRUE,
           striped = TRUE)
